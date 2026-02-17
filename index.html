@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows 98 - AI Chatbot</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Win98 Desktop -->
+    <div class="desktop" id="desktop">
+        <!-- Desktop Icons - Win98 Style -->
+        <!-- My Computer -->
+        <div class="desktop-icon" id="myComputer" data-icon="myComputer" style="top: 10px; left: 10px;">
+            <img src="icons/my_computer.png" alt="My Computer">
+            <span>我的电脑</span>
+        </div>
+
+        <!-- My Documents -->
+        <div class="desktop-icon" id="myDocuments" data-icon="myDocuments" style="top: 95px; left: 10px;">
+            <img src="icons/my_documents.png" alt="My Documents">
+            <span>我的文档</span>
+        </div>
+
+        <!-- Internet Explorer -->
+        <div class="desktop-icon" id="ieIcon" data-icon="ieIcon" style="top: 180px; left: 10px;">
+            <img src="icons/internet_explorer.png" alt="Internet Explorer">
+            <span>Internet Explorer</span>
+        </div>
+
+        <!-- Network Neighborhood -->
+        <div class="desktop-icon" id="network" data-icon="network" style="top: 265px; left: 10px;">
+            <img src="icons/network.png" alt="Network">
+            <span>网上邻居</span>
+        </div>
+
+        <!-- Recycle Bin -->
+        <div class="desktop-icon" id="recycleBin" data-icon="recycleBin" style="top: 350px; left: 10px;">
+            <img src="icons/recycle_bin.png" alt="Recycle Bin">
+            <span>回收站</span>
+        </div>
+
+        <!-- Outlook Express -->
+        <div class="desktop-icon" id="outlookIcon" data-icon="outlookIcon" style="top: 435px; left: 10px;">
+            <img src="icons/outlook_express.png" alt="Outlook Express">
+            <span>Outlook Express</span>
+        </div>
+
+        <input type="file" id="wallpaperInput" accept="image/*" style="display: none;">
+
+        <!-- Taskbar -->
+        <div class="taskbar">
+            <button class="start-button" id="startButton">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Cpath fill='%23c0c0c0' d='M0,0 L16,0 L8,8 Z'/%3E%3C/svg%3E"
+                    alt="Windows">
+                开始
+            </button>
+            <!-- Start Menu -->
+            <div class="start-menu" id="startMenu" style="display: none;">
+                <div class="start-menu-item" id="changeWallpaperItem">
+                    <span>🖼️</span> 更换桌面背景...
+                </div>
+                <div class="start-menu-item" id="resetWallpaperItem">
+                    <span>🌄</span> 恢复默认背景
+                </div>
+                <div class="start-menu-separator"></div>
+                <div class="start-menu-item" id="restartItem">
+                    <span>🔄</span> 重新启动
+                </div>
+                <div class="start-menu-separator"></div>
+                <div class="start-menu-item" id="shutdownItem">
+                    <span>⏻</span> 关闭系统
+                </div>
+            </div>
+            <div class="taskbar-separator"></div>
+            <div class="taskbar-windows">
+                <button class="taskbar-window" id="chatTaskbarBtn" style="display: none;">AI Chatbot</button>
+            </div>
+            <div class="taskbar-tray">
+                <span class="clock" id="clock">15:13</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Chat Window -->
+    <div class="window" id="chatWindow" style="display: none;">
+        <!-- Title Bar -->
+        <div class="title-bar">
+            <div class="title-bar-text">AI Chatbot</div>
+            <div class="title-bar-controls">
+                <button class="title-bar-btn" id="minimizeBtn">_</button>
+                <button class="title-bar-btn" id="maximizeBtn">□</button>
+                <button class="title-bar-btn close-btn" id="closeBtn">✕</button>
+            </div>
+        </div>
+
+        <!-- Menu Bar -->
+        <div class="menu-bar">
+            <div class="menu-item" id="fileMenu">
+                文件
+                <div class="menu-dropdown" id="fileDropdown">
+                    <div class="menu-option" id="settingsMenu">设置...</div>
+                    <div class="menu-option" id="exportMenu">导出聊天记录...</div>
+                    <div class="menu-separator"></div>
+                    <div class="menu-option" id="clearMenu">清除历史</div>
+                    <div class="menu-separator"></div>
+                    <div class="menu-option" id="exitMenu">退出</div>
+                </div>
+            </div>
+            <div class="menu-item" id="helpMenu">
+                帮助
+                <div class="menu-dropdown" id="helpDropdown">
+                    <div class="menu-option" id="aboutMenu">关于</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Model Info Bar -->
+        <div class="model-info" id="modelInfo">
+            <span id="currentModel">未选择模型</span>
+            <span id="modelCost"></span>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-area">
+            <div class="messages" id="messages">
+                <div class="system-message">欢迎使用 Windows 98 风格 AI Chatbot！请先在"文件 → 设置"中配置 API 密钥。</div>
+            </div>
+        </div>
+
+        <!-- Image Preview Area -->
+        <div class="image-preview-area" id="imagePreviewArea" style="display: none;">
+            <div class="image-preview-label">已选择图片：</div>
+            <div class="image-preview-container" id="imagePreviewContainer"></div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area">
+            <input type="file" id="imageInput" accept="image/jpeg,image/png,image/gif,image/webp"
+                style="display: none;">
+            <textarea id="messageInput" placeholder="输入消息... (Enter发送, Shift+Enter换行)" rows="3"></textarea>
+            <div class="input-buttons">
+                <button class="btn" id="uploadImageBtn" title="上传图片">📎</button>
+                <button class="btn primary" id="sendBtn">发送</button>
+            </div>
+        </div>
+
+        <!-- Resize Handles -->
+        <div class="resize-handle resize-nw"></div>
+        <div class="resize-handle resize-ne"></div>
+        <div class="resize-handle resize-sw"></div>
+        <div class="resize-handle resize-se"></div>
+    </div>
+
+    <!-- Settings Dialog -->
+    <div class="dialog-overlay" id="settingsDialog" style="display: none;">
+        <div class="dialog">
+            <div class="title-bar">
+                <div class="title-bar-text">设置</div>
+                <div class="title-bar-controls">
+                    <button class="title-bar-btn close-btn" id="closeSettingsBtn">✕</button>
+                </div>
+            </div>
+            <div class="dialog-content">
+                <div class="field-row">
+                    <label for="apiKeyInput">OpenRouter API Key:</label>
+                    <input type="password" id="apiKeyInput" class="text-input" placeholder="sk-or-...">
+                </div>
+
+                <div class="field-row">
+                    <label for="modelSelect">选择模型:</label>
+                    <select id="modelSelect" class="select-input">
+                        <option value="">-- 请选择模型 --</option>
+                        <optgroup label="OpenAI">
+                            <option value="openai/gpt-5.2" data-vision="true">GPT 5.2 ($1.75/$14 per M, 400K)</option>
+                            <option value="openai/gpt-4o-mini" data-vision="true">GPT 4o-mini ($0.15/$0.60 per M, 128K)
+                            </option>
+                            <option value="openai/gpt-5-mini" data-vision="true">GPT 5 mini ($0.25/$2 per M, 400K)
+                            </option>
+                            <option value="openai/gpt-5-nano" data-vision="true">GPT 5 nano ($0.05/$0.40 per M, 400K)
+                            </option>
+                        </optgroup>
+                        <optgroup label="Anthropic">
+                            <option value="anthropic/claude-4.5-sonnet" data-vision="true">Claude Sonnet 4.5 ($3/$15 per
+                                M, 1000K)</option>
+                        </optgroup>
+                        <optgroup label="DeepSeek">
+                            <option value="deepseek/deepseek-v3.2" data-vision="false">DeepSeek V3.2 ($0.27/$0.38 per M,
+                                128K)</option>
+                            <option value="deepseek/deepseek-r1" data-vision="false">DeepSeek R1 ($0.55/$2.19 per M,
+                                128K)</option>
+                        </optgroup>
+                        <optgroup label="Google">
+                            <option value="google/gemini-3-flash-preview" data-vision="true">Gemini 3 Flash Preview
+                                ($0.10/$0.40 per M, 1048K)</option>
+                            <option value="google/gemini-2.5-flash" data-vision="true">Gemini 2.5 Flash ($0.10/$0.40 per
+                                M, 1048K)</option>
+                        </optgroup>
+                        <optgroup label="Moonshot AI">
+                            <option value="moonshotai/kimi-k2.5" data-vision="false">Kimi K2.5 ($0.50/$2.80 per M, 262K)
+                            </option>
+                            <option value="moonshotai/kimi-k2-thinking" data-vision="false">Kimi K2 Thinking
+                                ($0.40/$1.75 per M, 262K)</option>
+                        </optgroup>
+                        <optgroup label="xAI">
+                            <option value="x-ai/grok-4.1-fast" data-vision="false">Grok 4.1 Fast ($0.20/$0.50 per M,
+                                2000K)</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="field-row">
+                    <div class="info-text" id="modelInfoText">
+                        选择模型后将显示详细费用信息
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <label for="fontSizeSelect">聊天字体大小:</label>
+                    <select id="fontSizeSelect" class="select-input">
+                        <option value="small">小 (10px)</option>
+                        <option value="medium" selected>中 (11px)</option>
+                        <option value="large">大 (13px)</option>
+                        <option value="xlarge">特大 (15px)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="dialog-buttons">
+                <button class="btn primary" id="saveSettingsBtn">保存</button>
+                <button class="btn" id="cancelSettingsBtn">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Dialog -->
+    <div class="dialog-overlay" id="aboutDialog" style="display: none;">
+        <div class="dialog small">
+            <div class="title-bar">
+                <div class="title-bar-text">关于</div>
+                <div class="title-bar-controls">
+                    <button class="title-bar-btn close-btn" id="closeAboutBtn">✕</button>
+                </div>
+            </div>
+            <div class="dialog-content">
+                <h3>Windows 98 AI Chatbot</h3>
+                <p>版本 1.0</p>
+                <p>一个怀旧的 Windows 98 风格 AI 聊天机器人</p>
+                <p>支持多个 AI 模型和图片理解功能</p>
+                <br>
+                <p>© 2026 - Powered by OpenRouter</p>
+            </div>
+            <div class="dialog-buttons">
+                <button class="btn primary" id="closeAboutOkBtn">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Viewer Modal -->
+    <div class="dialog-overlay" id="imageViewer" style="display: none;">
+        <div class="dialog large">
+            <div class="title-bar">
+                <div class="title-bar-text">图片查看器</div>
+                <div class="title-bar-controls">
+                    <button class="title-bar-btn close-btn" id="closeImageViewerBtn">✕</button>
+                </div>
+            </div>
+            <div class="dialog-content image-viewer-content">
+                <img id="viewerImage" src="" alt="查看图片">
+            </div>
+        </div>
+    </div>
+
+    <!-- My Computer Window -->
+    <div class="window" id="myComputerWindow" style="display: none; width: 500px; height: 400px;">
+        <div class="title-bar">
+            <div class="title-bar-text">我的电脑</div>
+            <div class="title-bar-controls">
+                <button class="title-bar-btn" onclick="minimizeMyComputer()">_</button>
+                <button class="title-bar-btn" onclick="maximizeMyComputer()">□</button>
+                <button class="title-bar-btn close-btn" onclick="closeMyComputer()">✕</button>
+            </div>
+        </div>
+        <div class="explorer-toolbar">
+            <button class="toolbar-btn">← 后退</button>
+            <button class="toolbar-btn">→ 前进</button>
+            <button class="toolbar-btn">⬆ 上一级</button>
+        </div>
+        <div class="explorer-address">
+            <span>地址:</span>
+            <input type="text" value="我的电脑" readonly>
+        </div>
+        <div class="explorer-content">
+            <div class="explorer-item">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect fill='%23c0c0c0' width='48' height='48'/%3E%3Ctext x='24' y='28' font-size='14' text-anchor='middle'%3E(C:)%3C/text%3E%3C/svg%3E"
+                    alt="C Drive">
+                <span>本地磁盘 (C:)</span>
+            </div>
+            <div class="explorer-item">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect fill='%23c0c0c0' width='48' height='48'/%3E%3Ctext x='24' y='28' font-size='14' text-anchor='middle'%3E(D:)%3C/text%3E%3C/svg%3E"
+                    alt="D Drive">
+                <span>本地磁盘 (D:)</span>
+            </div>
+            <div class="explorer-item">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect fill='%2300a8e8' width='48' height='48'/%3E%3Ctext x='24' y='28' font-size='20' text-anchor='middle'%3E📁%3C/text%3E%3C/svg%3E"
+                    alt="Documents">
+                <span>我的文档</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div class="context-menu" id="contextMenu" style="display: none;">
+        <div class="context-menu-item" id="propertiesItem">属性</div>
+    </div>
+
+    <!-- Properties Dialog -->
+    <div class="dialog-overlay" id="propertiesDialog" style="display: none;">
+        <div class="dialog">
+            <div class="title-bar">
+                <div class="title-bar-text">系统属性</div>
+                <div class="title-bar-controls">
+                    <button class="title-bar-btn close-btn" id="closePropertiesBtn">✕</button>
+                </div>
+            </div>
+            <div class="dialog-content">
+                <h3>Windows 98 AI Chatbot</h3>
+                <hr>
+                <p><strong>版本:</strong> 1.0.0</p>
+                <p><strong>系统:</strong> Windows 98 风格</p>
+                <p><strong>开发:</strong> AI Assistant</p>
+                <p><strong>发布日期:</strong> 2026-02-17</p>
+                <hr>
+                <p><strong>支持的AI模型:</strong> 12个</p>
+                <p><strong>功能特性:</strong></p>
+                <ul style="margin-left: 20px; font-size: 11px;">
+                    <li>多模态对话（文本 + 图片）</li>
+                    <li>流式响应</li>
+                    <li>聊天记录导出</li>
+                    <li>经典Win98界面</li>
+                </ul>
+            </div>
+            <div class="dialog-buttons">
+                <button class="btn primary" id="closePropertiesOkBtn">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
