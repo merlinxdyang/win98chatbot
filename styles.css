@@ -299,6 +299,16 @@ body {
     font-size: 10px;
     display: flex;
     justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+}
+
+.model-info:hover {
+    background: #e0e0e0;
+}
+
+.model-info:active {
+    background: #d0d0d0;
 }
 
 /* Chat Area */

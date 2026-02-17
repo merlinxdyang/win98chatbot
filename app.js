@@ -30,6 +30,9 @@ const MODELS = {
     'x-ai/grok-4.1-fast': { name: 'Grok 4.1 Fast', vision: false, inputCost: 0.20, outputCost: 0.50, context: '2000K' }
 };
 
+// Pending model change
+let pendingModel = null;
+
 // ========== State Management ==========
 const state = {
     apiKey: '',
@@ -126,6 +129,19 @@ const elements = {
     closePropertiesBtn: document.getElementById('closePropertiesBtn'),
     closePropertiesOkBtn: document.getElementById('closePropertiesOkBtn'),
 
+    // Quick Model Dialog
+    quickModelDialog: document.getElementById('quickModelDialog'),
+    quickModelSelect: document.getElementById('quickModelSelect'),
+    confirmQuickModelBtn: document.getElementById('confirmQuickModelBtn'),
+    cancelQuickModelBtn: document.getElementById('cancelQuickModelBtn'),
+    closeQuickModelBtn: document.getElementById('closeQuickModelBtn'),
+
+    // Model Change Confirmation Dialog
+    modelChangeConfirmDialog: document.getElementById('modelChangeConfirmDialog'),
+    confirmModelChangeBtn: document.getElementById('confirmModelChangeBtn'),
+    saveAndChangeModelBtn: document.getElementById('saveAndChangeModelBtn'),
+    cancelModelChangeBtn: document.getElementById('cancelModelChangeBtn'),
+
     // Clock
     clock: document.getElementById('clock')
 };
@@ -144,7 +160,7 @@ function init() {
 }
 
 function loadSettings() {
-    state.apiKey = localStorage.getItem(CONFIG.STORAGE_KEYS.API_KEY) || '';
+    state.apiKey = sessionStorage.getItem(CONFIG.STORAGE_KEYS.API_KEY) || '';
     state.selectedModel = localStorage.getItem(CONFIG.STORAGE_KEYS.MODEL) || '';
     applyDesktopBackground(localStorage.getItem(CONFIG.STORAGE_KEYS.DESKTOP_BG) || CONFIG.DEFAULT_WALLPAPER);
 
@@ -164,7 +180,7 @@ function loadSettings() {
 
 function saveSettings() {
     if (state.apiKey) {
-        localStorage.setItem(CONFIG.STORAGE_KEYS.API_KEY, state.apiKey);
+        sessionStorage.setItem(CONFIG.STORAGE_KEYS.API_KEY, state.apiKey);
     }
     if (state.selectedModel) {
         localStorage.setItem(CONFIG.STORAGE_KEYS.MODEL, state.selectedModel);
@@ -263,6 +279,31 @@ function setupEventListeners() {
     elements.closePropertiesBtn.addEventListener('click', closeProperties);
     elements.closePropertiesOkBtn.addEventListener('click', closeProperties);
     elements.propertiesItem.addEventListener('click', openProperties);
+
+    // Model info bar click (quick model switching)
+    elements.modelInfo.addEventListener('click', showQuickModelDialog);
+
+    // Quick Model Dialog events
+    elements.confirmQuickModelBtn.addEventListener('click', confirmQuickModelChange);
+    elements.cancelQuickModelBtn.addEventListener('click', () => {
+        elements.quickModelDialog.style.display = 'none';
+    });
+    elements.closeQuickModelBtn.addEventListener('click', () => {
+        elements.quickModelDialog.style.display = 'none';
+    });
+
+    // Model Change Confirmation Dialog events
+    elements.confirmModelChangeBtn.addEventListener('click', () => {
+        applyModelChange();
+    });
+    elements.saveAndChangeModelBtn.addEventListener('click', () => {
+        exportChatHistory(); // Save first
+        applyModelChange(); // Then change
+    });
+    elements.cancelModelChangeBtn.addEventListener('click', () => {
+        elements.modelChangeConfirmDialog.style.display = 'none';
+        pendingModel = null;
+    });
 }
 
 // ========== Desktop Icons ==========
@@ -706,6 +747,68 @@ function openAbout() {
 
 function closeAbout() {
     elements.aboutDialog.style.display = 'none';
+}
+
+// ========== Quick Model Switching ==========
+function showQuickModelDialog() {
+    // Check if API key is set
+    if (!state.apiKey) {
+        alert('请先在设置中配置 API Key');
+        return;
+    }
+
+    // Set current selected model in dropdown
+    elements.quickModelSelect.value = state.selectedModel;
+
+    // Show dialog
+    elements.quickModelDialog.style.display = 'flex';
+}
+
+function confirmQuickModelChange() {
+    const selectedModel = elements.quickModelSelect.value;
+
+    if (!selectedModel) {
+        alert('请选择一个模型');
+        return;
+    }
+
+    if (selectedModel === state.selectedModel) {
+        alert('已经在使用该模型');
+        elements.quickModelDialog.style.display = 'none';
+        return;
+    }
+
+    // Hide quick dialog and show confirmation
+    elements.quickModelDialog.style.display = 'none';
+
+    // Store pending model
+    pendingModel = selectedModel;
+
+    // Show confirmation dialog
+    elements.modelChangeConfirmDialog.style.display = 'flex';
+}
+
+function applyModelChange() {
+    if (!pendingModel) return;
+
+    // Clear current chat history
+    state.chatHistory = [];
+    state.currentImage = null;
+    elements.messages.innerHTML = '';
+    elements.imagePreviewArea.innerHTML = '';
+
+    // Update model
+    state.selectedModel = pendingModel;
+    saveSettings();
+    updateModelInfo();
+    updateImageUploadButton();
+
+    // Hide confirmation dialog
+    elements.modelChangeConfirmDialog.style.display = 'none';
+    pendingModel = null;
+
+    // Show success message
+    addMessage('系统', `已切换至 ${MODELS[state.selectedModel].name}`, 'system');
 }
 
 // ========== Model Info ==========

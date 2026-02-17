@@ -257,6 +257,82 @@
         </div>
     </div>
 
+    <!-- Quick Model Selector Dialog -->
+    <div class="dialog-overlay" id="quickModelDialog" style="display: none;">
+        <div class="dialog">
+            <div class="title-bar">
+                <div class="title-bar-text">快速切换模型</div>
+                <div class="title-bar-controls">
+                    <button class="title-bar-btn close-btn" id="closeQuickModelBtn">✕</button>
+                </div>
+            </div>
+            <div class="dialog-content">
+                <div class="field-row">
+                    <label for="quickModelSelect">选择模型:</label>
+                    <select id="quickModelSelect" class="select-input">
+                        <option value="">-- 请选择模型 --</option>
+                        <optgroup label="OpenAI">
+                            <option value="openai/gpt-5.2" data-vision="true">GPT 5.2 ($1.75/$14 per M, 400K)</option>
+                            <option value="openai/gpt-4o-mini" data-vision="true">GPT 4o-mini ($0.15/$0.60 per M, 128K)
+                            </option>
+                            <option value="openai/gpt-5-mini" data-vision="true">GPT 5 mini ($0.25/$2 per M, 400K)
+                            </option>
+                            <option value="openai/gpt-5-nano" data-vision="true">GPT 5 nano ($0.05/$0.40 per M, 400K)
+                            </option>
+                        </optgroup>
+                        <optgroup label="Anthropic">
+                            <option value="anthropic/claude-4.5-sonnet" data-vision="true">Claude Sonnet 4.5 ($3/$15 per
+                                M, 1000K)</option>
+                        </optgroup>
+                        <optgroup label="DeepSeek">
+                            <option value="deepseek/deepseek-v3.2" data-vision="false">DeepSeek V3.2 ($0.27/$0.38 per M,
+                                128K)</option>
+                            <option value="deepseek/deepseek-r1" data-vision="false">DeepSeek R1 ($0.55/$2.19 per M,
+                                128K)</option>
+                        </optgroup>
+                        <optgroup label="Google">
+                            <option value="google/gemini-3-flash-preview" data-vision="true">Gemini 3 Flash Preview
+                                ($0.10/$0.40 per M, 1048K)</option>
+                            <option value="google/gemini-2.5-flash" data-vision="true">Gemini 2.5 Flash ($0.10/$0.40 per
+                                M, 1048K)</option>
+                        </optgroup>
+                        <optgroup label="MoonshotAI">
+                            <option value="moonshotai/kimi-k2.5" data-vision="false">Kimi K2.5 ($0.50/$2.80 per M, 262K)
+                            </option>
+                            <option value="moonshotai/kimi-k2-thinking" data-vision="false">Kimi K2 Thinking
+                                ($0.40/$1.75 per M, 262K)</option>
+                        </optgroup>
+                        <optgroup label="xAI">
+                            <option value="x-ai/grok-4.1-fast" data-vision="false">Grok 4.1 Fast ($0.20/$0.50 per M,
+                                2000K)</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="dialog-buttons">
+                    <button class="btn primary" id="confirmQuickModelBtn">确定</button>
+                    <button class="btn" id="cancelQuickModelBtn">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Change Confirmation Dialog -->
+    <div class="dialog-overlay" id="modelChangeConfirmDialog" style="display: none;">
+        <div class="dialog small">
+            <div class="title-bar">
+                <div class="title-bar-text">确认更换模型</div>
+            </div>
+            <div class="dialog-content">
+                <p>更换模型将清空当前聊天历史，是否继续？</p>
+            </div>
+            <div class="dialog-buttons">
+                <button class="btn primary" id="confirmModelChangeBtn">是</button>
+                <button class="btn primary" id="saveAndChangeModelBtn">保存并继续</button>
+                <button class="btn" id="cancelModelChangeBtn">否</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Image Viewer Modal -->
     <div class="dialog-overlay" id="imageViewer" style="display: none;">
         <div class="dialog large">
